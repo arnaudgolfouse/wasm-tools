@@ -15,6 +15,7 @@ exclude = ["benches/*.wasm"]
 [dependencies]
 indexmap = { workspace = true }
 semver = { workspace = true }
+wasm-types = { workspace = true }
 
 [dev-dependencies]
 anyhow = { workspace = true }

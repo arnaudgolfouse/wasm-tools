@@ -1107,8 +1107,8 @@ fn arbitrary_val(ty: ValType, u: &mut Unstructured<'_>) -> Instruction {
         ValType::F64 => Instruction::F64Const(u.arbitrary().unwrap_or(0.0)),
         ValType::V128 => Instruction::V128Const(u.arbitrary().unwrap_or(0)),
         ValType::Ref(ty) => {
-            assert!(ty.nullable);
-            Instruction::RefNull(ty.heap_type)
+            assert!(ty.is_nullable());
+            Instruction::RefNull(ty.heap_type())
         }
     }
 }
@@ -4511,7 +4511,7 @@ fn ref_null(
 ) -> Result<()> {
     let ty = *u.choose(&[RefType::EXTERNREF, RefType::FUNCREF])?;
     builder.push_operands(&[ty.into()]);
-    instructions.push(Instruction::RefNull(ty.heap_type));
+    instructions.push(Instruction::RefNull(ty.heap_type()));
     Ok(())
 }
 

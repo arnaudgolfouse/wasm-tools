@@ -575,10 +575,7 @@ impl From<core::ValType<'_>> for wasm_encoder::ValType {
 
 impl From<core::RefType<'_>> for wasm_encoder::RefType {
     fn from(r: core::RefType<'_>) -> Self {
-        wasm_encoder::RefType {
-            nullable: r.nullable,
-            heap_type: r.heap.into(),
-        }
+        wasm_encoder::RefType::new(r.nullable, r.heap.into()).unwrap()
     }
 }
 

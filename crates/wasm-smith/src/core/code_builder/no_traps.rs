@@ -400,8 +400,8 @@ fn dummy_value_inst<'a>(ty: ValType) -> Instruction<'a> {
         ValType::F64 => Instruction::F64Const(0.0),
         ValType::V128 => Instruction::V128Const(0),
         ValType::Ref(ty) => {
-            assert!(ty.nullable);
-            Instruction::RefNull(ty.heap_type)
+            assert!(ty.is_nullable());
+            Instruction::RefNull(ty.heap_type())
         }
     }
 }

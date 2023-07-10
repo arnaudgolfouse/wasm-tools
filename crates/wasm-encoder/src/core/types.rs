@@ -1,5 +1,7 @@
 use crate::{encode_section, Encode, Section, SectionId};
 
+pub use wasm_types::{HeapType, RefType};
+
 /// Represents a subtype of possible other types in a WebAssembly module.
 #[derive(Debug, Clone)]
 pub struct SubType {
@@ -144,50 +146,24 @@ impl Encode for ValType {
     }
 }
 
-/// A reference type.
-///
-/// This is largely part of the function references proposal for WebAssembly but
-/// additionally is used by the `funcref` and `externref` types. The full
-/// generality of this type is only exercised with function-references.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Ord, PartialOrd)]
-#[allow(missing_docs)]
-pub struct RefType {
-    pub nullable: bool,
-    pub heap_type: HeapType,
-}
-
-impl RefType {
-    /// Alias for the `funcref` type in WebAssembly
-    pub const FUNCREF: RefType = RefType {
-        nullable: true,
-        heap_type: HeapType::Func,
-    };
-
-    /// Alias for the `externref` type in WebAssembly
-    pub const EXTERNREF: RefType = RefType {
-        nullable: true,
-        heap_type: HeapType::Extern,
-    };
-}
-
 impl Encode for RefType {
     fn encode(&self, sink: &mut Vec<u8>) {
-        if self.nullable {
+        if self.is_nullable() {
             // Favor the original encodings of `funcref` and `externref` where
             // possible
-            match self.heap_type {
+            match self.heap_type() {
                 HeapType::Func => return sink.push(0x70),
                 HeapType::Extern => return sink.push(0x6f),
                 _ => {}
             }
         }
 
-        if self.nullable {
+        if self.is_nullable() {
             sink.push(0x6C);
         } else {
             sink.push(0x6B);
         }
-        self.heap_type.encode(sink);
+        self.heap_type().encode(sink);
     }
 }
 
@@ -195,34 +171,6 @@ impl From<RefType> for ValType {
     fn from(ty: RefType) -> ValType {
         ValType::Ref(ty)
     }
-}
-
-/// Part of the function references proposal.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Ord, PartialOrd)]
-pub enum HeapType {
-    /// Untyped (any) function.
-    Func,
-    /// External heap type.
-    Extern,
-    /// The `any` heap type. The common supertype (a.k.a. top) of all internal types.
-    Any,
-    /// The `none` heap type. The common subtype (a.k.a. bottom) of all internal types.
-    None,
-    /// The `noextern` heap type. The common subtype (a.k.a. bottom) of all external types.
-    NoExtern,
-    /// The `nofunc` heap type. The common subtype (a.k.a. bottom) of all function types.
-    NoFunc,
-    /// The `eq` heap type. The common supertype of all referenceable types on which comparison
-    /// (ref.eq) is allowed.
-    Eq,
-    /// The `struct` heap type. The common supertype of all struct types.
-    Struct,
-    /// The `array` heap type. The common supertype of all array types.
-    Array,
-    /// The i31 heap type.
-    I31,
-    /// User defined type at the given index.
-    Indexed(u32),
 }
 
 impl Encode for HeapType {

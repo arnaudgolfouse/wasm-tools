@@ -611,7 +611,7 @@ impl<'a> Module<'a> {
             let ty = wasm_encoder::TableType {
                 minimum: table.ty.initial,
                 maximum: table.ty.maximum,
-                element_type: map.refty(table.ty.element_type),
+                element_type: table.ty.element_type,
             };
             match &table.def {
                 Definition::Import(m, n) => {
@@ -1107,7 +1107,7 @@ impl Encoder {
             wasmparser::ValType::F32 => wasm_encoder::ValType::F32,
             wasmparser::ValType::F64 => wasm_encoder::ValType::F64,
             wasmparser::ValType::V128 => wasm_encoder::ValType::V128,
-            wasmparser::ValType::Ref(rt) => wasm_encoder::ValType::Ref(self.refty(rt)),
+            wasmparser::ValType::Ref(rt) => wasm_encoder::ValType::Ref(rt),
         }
     }
 
@@ -1116,13 +1116,6 @@ impl Encoder {
             StorageType::I8 => wasm_encoder::StorageType::I8,
             StorageType::I16 => wasm_encoder::StorageType::I16,
             StorageType::Val(ty) => wasm_encoder::StorageType::Val(self.valty(ty)),
-        }
-    }
-
-    fn refty(&self, rt: wasmparser::RefType) -> wasm_encoder::RefType {
-        wasm_encoder::RefType {
-            nullable: rt.is_nullable(),
-            heap_type: self.heapty(rt.heap_type()),
         }
     }
 

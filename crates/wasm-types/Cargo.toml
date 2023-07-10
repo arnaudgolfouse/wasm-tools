@@ -1,0 +1,9 @@
+[package]
+name = "wasm-types"
+version = "0.1.0"
+authors = ["Arnaud Golfouse <arnaud.golfouse@laposte.net>"]
+license = "Apache-2.0 WITH LLVM-exception"
+repository = "https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasm-types"
+homepage = "https://github.com/bytecodealliance/wasm-tools/tree/main/crates/wasm-types"
+keywords = ["WebAssembly", "wasm"]
+edition.workspace = true

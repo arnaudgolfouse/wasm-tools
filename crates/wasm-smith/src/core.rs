@@ -661,7 +661,7 @@ impl Module {
 
                 wasmparser::TypeRef::Table(table_ty) => {
                     let table_ty = TableType {
-                        element_type: convert_reftype(table_ty.element_type),
+                        element_type: table_ty.element_type,
                         minimum: table_ty.initial,
                         maximum: table_ty.maximum,
                     };
@@ -886,12 +886,12 @@ impl Module {
                         ValType::F64 => ConstExpr::f64_const(u.arbitrary()?),
                         ValType::V128 => ConstExpr::v128_const(u.arbitrary()?),
                         ValType::Ref(ty) => {
-                            assert!(ty.nullable);
-                            if ty.heap_type == HeapType::Func && num_funcs > 0 && u.arbitrary()? {
+                            assert!(ty.is_nullable());
+                            if ty.heap_type() == HeapType::Func && num_funcs > 0 && u.arbitrary()? {
                                 let func = u.int_in_range(0..=num_funcs - 1)?;
                                 return Ok(GlobalInitExpr::FuncRef(func));
                             }
-                            ConstExpr::ref_null(ty.heap_type)
+                            ConstExpr::ref_null(ty.heap_type())
                         }
                     }))
                 }));
@@ -1639,26 +1639,7 @@ fn convert_type(parsed_type: wasmparser::ValType) -> ValType {
         F32 => ValType::F32,
         F64 => ValType::F64,
         V128 => ValType::V128,
-        Ref(ty) => ValType::Ref(convert_reftype(ty)),
-    }
-}
-
-fn convert_reftype(ty: wasmparser::RefType) -> RefType {
-    wasm_encoder::RefType {
-        nullable: ty.is_nullable(),
-        heap_type: match ty.heap_type() {
-            wasmparser::HeapType::Func => HeapType::Func,
-            wasmparser::HeapType::Extern => HeapType::Extern,
-            wasmparser::HeapType::Any => HeapType::Any,
-            wasmparser::HeapType::None => HeapType::None,
-            wasmparser::HeapType::NoExtern => HeapType::NoExtern,
-            wasmparser::HeapType::NoFunc => HeapType::NoFunc,
-            wasmparser::HeapType::Eq => HeapType::Eq,
-            wasmparser::HeapType::Struct => HeapType::Struct,
-            wasmparser::HeapType::Array => HeapType::Array,
-            wasmparser::HeapType::I31 => HeapType::I31,
-            wasmparser::HeapType::Indexed(i) => HeapType::Indexed(i.into()),
-        },
+        Ref(ty) => ValType::Ref(ty),
     }
 }
 

@@ -53,6 +53,7 @@ wasm-shrink = { version = "0.1.28", path = "crates/wasm-shrink" }
 wasm-smith = { version = "0.12.10", path = "crates/wasm-smith" }
 wasmparser = { version = "0.107.0", path = "crates/wasmparser" }
 wasmprinter = { version = "0.2.59", path = "crates/wasmprinter" }
+wasm-types = { version = "0.1.0", path = "crates/wasm-types" }
 wast = { version = "60.0.0", path = "crates/wast" }
 wat = { version = "1.0.66", path = "crates/wat" }
 wit-component = { version = "0.11.0", path = "crates/wit-component" }
